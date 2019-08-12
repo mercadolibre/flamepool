@@ -5,7 +5,7 @@
 # What is Flamepool?
 Flamepool is a worker pool implementation for Golang inspired on the thread pool pattern.
 # Installation
-> go get github.com/mercadolibre/fury_flamepool
+> go get github.com/mercadolibre/flamepool
 
 # Basic usage
 You can use either an explicit task or annonymous function, both alternatives allows you to accomplish the same thing. The main difference is that the annonymous function is better for simpler scenarios because probably you wont need to pass a lot of parameters to the function.  
@@ -25,7 +25,7 @@ package main
 import (
 	"fmt"
 
-	fp "github.com/mercadolibre/fury_flamepool"
+	fp "github.com/mercadolibre/flamepool"
 )
 
 func main() {
@@ -85,7 +85,7 @@ package main
 import (
 	"fmt"
 
-	fp "github.com/mercadolibre/fury_flamepool"
+	fp "github.com/mercadolibre/flamepool"
 )
 
 func main() {
