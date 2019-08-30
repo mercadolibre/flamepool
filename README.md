@@ -3,7 +3,7 @@
 # :fire:Flamepool:fire:  
 
 # What is Flamepool?
-Flamepool is a worker pool implementation for Golang inspired on the thread pool pattern.
+Flamepool is a worker pool implementation for Go inspired on the thread pool pattern.
 # Installation
 > go get github.com/mercadolibre/flamepool
 
