@@ -1,7 +1,6 @@
 ![technology Go](https://img.shields.io/badge/technology-go-blue.svg)
-![goversion-url](https://golang.org/)
+![goversion-image](https://img.shields.io/badge/Go-1.12+-00ADD8.svg)
 ![report-image](https://goreportcard.com/badge/github.com/mercadolibre/flamepool)
-![report-url](https://goreportcard.com/report/github.com/mercadolibre/flamepool)
 
 # :fire:Flamepool:fire:  
 
