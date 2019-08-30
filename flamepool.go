@@ -5,6 +5,7 @@ import (
 	"reflect"
 )
 
+// Pool Task
 type Pool struct {
 	poolSize   int
 	resultChan chan interface{}
@@ -16,6 +17,7 @@ type Pool struct {
 	params []reflect.Value
 }
 
+// New pool task
 func New(poolSize int, items interface{}) *Pool {
 	return newPool(poolSize, items)
 }
@@ -42,6 +44,7 @@ func newPool(poolSize int, items interface{}) *Pool {
 	return pool
 }
 
+// Run task
 func (pool *Pool) Run(obj interface{}, args ...interface{}) (FlameResults, error) {
 	v := reflect.ValueOf(obj)
 	if v.Kind() == reflect.Func {
@@ -49,9 +52,10 @@ func (pool *Pool) Run(obj interface{}, args ...interface{}) (FlameResults, error
 	} else if v.Kind() == reflect.Struct {
 		return pool.runTask(obj)
 	}
-	return FlameResults{}, errors.New("Invalid type")
+	return FlameResults{}, errors.New("invalid type")
 }
 
+// ChangeSettings for pool
 func (pool *Pool) ChangeSettings(poolSize int, items interface{}) {
 	pool = newPool(poolSize, items)
 }
