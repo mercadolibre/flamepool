@@ -4,6 +4,7 @@ import (
 	"errors"
 )
 
+// Task Flamepool
 type Task interface {
 	Do(element interface{}) (interface{}, error)
 }
@@ -13,7 +14,7 @@ func (pool *Pool) runTask(obj interface{}) (FlameResults, error) {
 
 	task, ok := obj.(Task)
 	if !ok {
-		return flameresult, errors.New("The struct must be a Task")
+		return flameresult, errors.New("the struct must be a task")
 	}
 
 	for i := 0; i < pool.poolSize; i++ {
