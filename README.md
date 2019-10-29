@@ -33,12 +33,12 @@ import (
 func main() {
 
 	// The things you want to process through the workers concurrently
-	elements := []string{"Bart", "Lisa", "Maggie", "Abraham", "Homer", "Marge", "Mona"}
+	elements := []interface{}{"Bart", "Lisa", "Maggie", "Abraham", "Homer", "Marge", "Mona"}
 
 	// The workers quantity. Choose as many as you want!
 	workers := 2
 
-	pool := fp.New(workers, elements)
+	pool := fp.New(workers, elements...)
 	results, runErr := pool.Run(AddLastnameTask{})
 
 	if runErr != nil {
@@ -93,12 +93,12 @@ import (
 func main() {
 
 	// The things you want to process through the workers concurrently
-	elements := []string{"Bart", "Lisa", "Maggie", "Abraham", "Homer", "Marge", "Mona"}
+	elements := []interface{}{"Bart", "Lisa", "Maggie", "Abraham", "Homer", "Marge", "Mona"}
 
 	// The workers quantity. Choose as many as you want!
 	workers := 2
 
-	pool := fp.New(workers, elements)
+	pool := fp.New(workers, elements...)
 
 	// Using the "anonymous" function, which receives each item from elements slice as "name" parameter
 	task := func(name interface{}) (interface{}, error) {
