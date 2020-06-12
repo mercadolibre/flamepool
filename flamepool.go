@@ -3,6 +3,7 @@ package flamepool
 import (
 	"errors"
 	"reflect"
+	"runtime"
 )
 
 // Pool Task
@@ -40,6 +41,13 @@ func newPool(poolSize int, items interface{}) *Pool {
 	pool.resultChan = make(chan interface{}, len(pool.elements))
 	pool.errorChan = make(chan error, len(pool.elements))
 	pool.innerChan = make(chan interface{}, len(pool.elements))
+
+	runtime.SetFinalizer(pool, func(p *Pool) {
+		// Close all channels from pool on garbage collection
+		close(p.resultChan)
+		close(p.errorChan)
+		close(p.innerChan)
+	})
 
 	return pool
 }
