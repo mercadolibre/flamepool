@@ -65,5 +65,7 @@ func (pool *Pool) Run(obj interface{}, args ...interface{}) (FlameResults, error
 
 // ChangeSettings for pool
 func (pool *Pool) ChangeSettings(poolSize int, items interface{}) {
-	pool = newPool(poolSize, items)
+	newPool := newPool(poolSize, items)
+
+	*pool = *newPool
 }

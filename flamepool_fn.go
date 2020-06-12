@@ -10,11 +10,6 @@ import (
 func (pool *Pool) runFn(fn interface{}, args ...interface{}) (FlameResults, error) {
 	flameresult := FlameResults{}
 
-	v := reflect.ValueOf(fn)
-	if v.Kind() != reflect.Func {
-		return flameresult, errors.New("First argument must be a function")
-	}
-
 	fnStr := fmt.Sprint(reflect.TypeOf(fn))
 	if !paramsAreValid(fnStr, args...) {
 		return flameresult, errors.New("Params invalid, one param for each element required")
@@ -26,6 +21,7 @@ func (pool *Pool) runFn(fn interface{}, args ...interface{}) (FlameResults, erro
 		rargs[i+1] = reflect.ValueOf(a)
 	}
 
+	v := reflect.ValueOf(fn)
 	for i := 0; i < pool.poolSize; i++ {
 		go pool.turnOnFnWorkers(v, rargs)
 	}
@@ -60,8 +56,9 @@ func (pool *Pool) turnOnFnWorkers(fn reflect.Value, params []reflect.Value) {
 		res, err := results[0].Interface(), results[1].Interface()
 		if err != nil {
 			pool.errorChan <- err.(error)
+		} else {
+			pool.resultChan <- res
 		}
-		pool.resultChan <- res
 	}
 }
 
@@ -77,6 +74,9 @@ func paramsAreValid(kind string, args ...interface{}) bool {
 
 func returnsAreValid(kind string) bool {
 	splitted := strings.Split(kind, "(")
+	if len(splitted) < 3 {
+		return false
+	}
 	params := strings.Split(splitted[2], ",")
 
 	if len(params) == 2 {

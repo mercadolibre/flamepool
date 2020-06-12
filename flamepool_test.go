@@ -58,6 +58,56 @@ func TestRunFnWithErr(t *testing.T) {
 	pool.Run(fn)
 }
 
+func TestRunFnWithErrMoreArguments(t *testing.T) {
+	pool := New(1, []string{"tom", "b"})
+	fn := func(element string, element2 string) (interface{}, error) {
+		return element, nil
+	}
+	_, err := pool.Run(fn, "tom", "otro argumento", "otro mas")
+	if err == nil {
+		t.Errorf("poo.Run() received more arguments compared to the function.")
+	}
+}
+
+func TestRunFnWithErrLessArguments(t *testing.T) {
+	pool := New(1, []string{"tom", "b"})
+	fn := func(element string, element2 string) (interface{}, error) {
+		return element, nil
+	}
+	_, err := pool.Run(fn)
+	if err == nil {
+		t.Errorf("poo.Run() received less arguments compared to the function.")
+	}
+}
+
+func TestRunFnWithErrLessReturns(t *testing.T) {
+	pool := New(1, []string{"tom", "b"})
+	fn := func(element string) interface{} {
+		return element
+	}
+	_, err := pool.Run(fn)
+	if err == nil {
+		t.Errorf("poo.Run() return less parameters.")
+	}
+}
+
+func TestChangeSettings(t *testing.T) {
+	pool := New(1, []string{"tom", "b"})
+	oldSize := pool.poolSize
+	pool.ChangeSettings(3, []string{"tom", "b", "c", "d"})
+	if pool.poolSize == oldSize {
+		t.Errorf("Pool size must be different." + fmt.Sprint(pool.poolSize))
+	}
+}
+
+func TestRunInvalidType(t *testing.T) {
+	pool := New(1, []string{"tom", "b"})
+	_, err := pool.Run(3)
+	if err == nil {
+		t.Errorf("pool.Run() should error. ")
+	}
+}
+
 func TestRunTaskFailBecauseNoTaskReceived(t *testing.T) {
 	pool := New(1, []string{"rulo", "tomcat"})
 	NotATask := struct {
