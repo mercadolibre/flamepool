@@ -165,6 +165,21 @@ func TestResultChannelReception(t *testing.T) {
 	}
 }
 
+func TestClose(t *testing.T) {
+	elements := []string{"rulo", "tomcat"}
+	pool := New(1, elements)
+
+	pool.Close()
+
+	select {
+	case <-pool.errorChan:
+	case <-pool.innerChan:
+	case <-pool.resultChan:
+	default:
+		t.Error("Channels should be closed")
+	}
+}
+
 type FooTaskAlwaysDoError struct{}
 
 func (ft FooTaskAlwaysDoError) Do(element interface{}) (interface{}, error) {

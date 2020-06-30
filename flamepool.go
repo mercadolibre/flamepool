@@ -61,3 +61,10 @@ func (pool *Pool) ChangeSettings(poolSize int, items interface{}) {
 
 	*pool = *newPool
 }
+
+// Close Closes all channels and resources associated with pool
+func (pool *Pool) Close() {
+	close(pool.resultChan)
+	close(pool.errorChan)
+	close(pool.innerChan)
+}
