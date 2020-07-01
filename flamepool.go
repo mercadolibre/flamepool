@@ -18,23 +18,16 @@ type Pool struct {
 }
 
 // New pool task
-func New(poolSize int, items interface{}) *Pool {
+func New(poolSize int, items ...interface{}) *Pool {
 	return newPool(poolSize, items)
 }
 
-func newPool(poolSize int, items interface{}) *Pool {
+func newPool(poolSize int, items []interface{}) *Pool {
 	pool := &Pool{}
 	pool.poolSize = poolSize
 
-	elements := []interface{}{}
-
-	v := reflect.ValueOf(items)
-	if v.Kind() == reflect.Slice {
-		for i := 0; i < v.Len(); i++ {
-			elem := v.Index(i).Interface()
-			elements = append(elements, elem)
-		}
-	}
+	elements := make([]interface{}, len(items))
+	copy(elements, items)
 
 	pool.elements = elements
 	pool.resultChan = make(chan interface{}, len(pool.elements))
@@ -56,7 +49,7 @@ func (pool *Pool) Run(obj interface{}, args ...interface{}) (FlameResults, error
 }
 
 // ChangeSettings for pool
-func (pool *Pool) ChangeSettings(poolSize int, items interface{}) {
+func (pool *Pool) ChangeSettings(poolSize int, items ...interface{}) {
 	newPool := newPool(poolSize, items)
 
 	*pool = *newPool

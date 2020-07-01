@@ -8,11 +8,27 @@ import (
 )
 
 func TestNew(t *testing.T) {
-	pool := New(20, []string{"tom"})
-
-	if pool == nil {
-		t.Error("Expected initialized pool")
+	tests := []struct {
+		name  string
+		elems []interface{}
+	}{
+		{"zero elements", []interface{}{}},
+		{"one element", []interface{}{"tom"}},
+		{"two elements", []interface{}{"foo", "bar"}},
 	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			pool := New(20, tt.elems...)
+			if pool == nil {
+				t.Error("Expected initialized pool")
+			}
+			if len(pool.elements) != len(tt.elems) {
+				t.Errorf("different number of elements, got %d, want %d",
+					len(pool.elements), len(tt.elems))
+			}
+		})
+	}
+
 }
 
 func TestParamsAreValid(t *testing.T) {
@@ -40,7 +56,7 @@ func TestReturnsAreValid(t *testing.T) {
 }
 
 func TestRunFnSuccess(t *testing.T) {
-	pool := New(1, []string{"tom"})
+	pool := New(1, "tom")
 	fn := func(element string, othervar string) (interface{}, error) {
 		return element + "--", nil
 	}
@@ -48,7 +64,7 @@ func TestRunFnSuccess(t *testing.T) {
 }
 
 func TestRunFnWithErr(t *testing.T) {
-	pool := New(1, []string{"tom", "b"})
+	pool := New(1, "tom", "b")
 	fn := func(element string) (interface{}, error) {
 		if element == "b" {
 			return nil, errors.New("error")
@@ -59,7 +75,7 @@ func TestRunFnWithErr(t *testing.T) {
 }
 
 func TestRunFnWithErrMoreArguments(t *testing.T) {
-	pool := New(1, []string{"tom", "b"})
+	pool := New(1, "tom", "b")
 	fn := func(element string, element2 string) (interface{}, error) {
 		return element, nil
 	}
@@ -70,7 +86,7 @@ func TestRunFnWithErrMoreArguments(t *testing.T) {
 }
 
 func TestRunFnWithErrLessArguments(t *testing.T) {
-	pool := New(1, []string{"tom", "b"})
+	pool := New(1, "tom", "b")
 	fn := func(element string, element2 string) (interface{}, error) {
 		return element, nil
 	}
@@ -81,7 +97,7 @@ func TestRunFnWithErrLessArguments(t *testing.T) {
 }
 
 func TestRunFnWithErrLessReturns(t *testing.T) {
-	pool := New(1, []string{"tom", "b"})
+	pool := New(1, "tom", "b")
 	fn := func(element string) interface{} {
 		return element
 	}
@@ -92,7 +108,7 @@ func TestRunFnWithErrLessReturns(t *testing.T) {
 }
 
 func TestChangeSettings(t *testing.T) {
-	pool := New(1, []string{"tom", "b"})
+	pool := New(1, "tom", "b")
 	oldSize := pool.poolSize
 	pool.ChangeSettings(3, []string{"tom", "b", "c", "d"})
 	if pool.poolSize == oldSize {
@@ -101,7 +117,7 @@ func TestChangeSettings(t *testing.T) {
 }
 
 func TestRunInvalidType(t *testing.T) {
-	pool := New(1, []string{"tom", "b"})
+	pool := New(1, "tom", "b")
 	_, err := pool.Run(3)
 	if err == nil {
 		t.Errorf("pool.Run() should error. ")
@@ -109,7 +125,7 @@ func TestRunInvalidType(t *testing.T) {
 }
 
 func TestRunTaskFailBecauseNoTaskReceived(t *testing.T) {
-	pool := New(1, []string{"rulo", "tomcat"})
+	pool := New(1, "rulo", "tomcat")
 	NotATask := struct {
 		Foo string
 	}{
@@ -122,8 +138,8 @@ func TestRunTaskFailBecauseNoTaskReceived(t *testing.T) {
 }
 
 func TestErrorChannelReception(t *testing.T) {
-	elements := []string{"rulo", "tomcat"}
-	pool := New(1, elements)
+	elements := []interface{}{"rulo", "tomcat"}
+	pool := New(1, elements...)
 
 	// This task has a Do() that always inject an error in the error channel
 	task := FooTaskAlwaysDoError{}
@@ -144,8 +160,8 @@ func TestErrorChannelReception(t *testing.T) {
 }
 
 func TestResultChannelReception(t *testing.T) {
-	elements := []string{"rulo", "tomcat"}
-	pool := New(1, elements)
+	elements := []interface{}{"rulo", "tomcat"}
+	pool := New(1, elements...)
 
 	// This task has a Do() that always inject an successful in the result channel
 	task := FooTaskAlwaysDoSuccessfulResult{}
