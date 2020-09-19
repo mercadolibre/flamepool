@@ -1,7 +1,7 @@
 package flamepool
 
 import (
-	"errors"
+	"fmt"
 	"reflect"
 )
 
@@ -23,10 +23,7 @@ func New(poolSize int, items interface{}) *Pool {
 }
 
 func newPool(poolSize int, items interface{}) *Pool {
-	pool := &Pool{}
-	pool.poolSize = poolSize
-
-	elements := []interface{}{}
+	var elements []interface{}
 
 	v := reflect.ValueOf(items)
 	if v.Kind() == reflect.Slice {
@@ -36,23 +33,25 @@ func newPool(poolSize int, items interface{}) *Pool {
 		}
 	}
 
-	pool.elements = elements
-	pool.resultChan = make(chan interface{}, len(pool.elements))
-	pool.errorChan = make(chan error, len(pool.elements))
-	pool.innerChan = make(chan interface{}, len(pool.elements))
+	pool := &Pool{
+		poolSize:   poolSize,
+		elements:   elements,
+		resultChan: make(chan interface{}, len(elements)),
+		errorChan:  make(chan error, len(elements)),
+		innerChan:  make(chan interface{}, len(elements)),
+	}
 
 	return pool
 }
 
 // Run task
 func (pool *Pool) Run(obj interface{}, args ...interface{}) (FlameResults, error) {
-	v := reflect.ValueOf(obj)
-	if v.Kind() == reflect.Func {
-		return pool.runFn(obj, args...)
-	} else if v.Kind() == reflect.Struct {
-		return pool.runTask(obj)
+	flameResult, err := pool.run(obj, args...)
+	if err != nil {
+		return FlameResults{}, fmt.Errorf("error: %v", err)
 	}
-	return FlameResults{}, errors.New("invalid type")
+
+	return flameResult, nil
 }
 
 // ChangeSettings for pool

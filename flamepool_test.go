@@ -15,27 +15,24 @@ func TestNew(t *testing.T) {
 	}
 }
 
-func TestParamsAreValid(t *testing.T) {
-	valid := paramsAreValid("func (string, string) ( string, error)", "tom")
-	if valid == false {
-		t.Error("Expected valid params")
+func TestIsValid(t *testing.T) {
+	functions := []struct {
+		kind     string
+		args     []interface{}
+		expected bool
+	}{
+		{"func (string, string) ( string, error)", []interface{}{"tom"}, true},
+		{"func ([]string, string) (string, error)", []interface{}{[]string{"tom", "jerry", "butch"}}, true},
+		{"func (string, string) ( string, error)", []interface{}{}, false},
+		{"func () (string, error)", []interface{}{"tom", "tom"}, false},
+		{"func (string, string)  (string)", []interface{}{15}, false},
 	}
 
-	valid = paramsAreValid("func () (string, error)", "tom", "tom")
-	if valid == true {
-		t.Error("Expected invalid params")
-	}
-}
-
-func TestReturnsAreValid(t *testing.T) {
-	valid := returnsAreValid("func (string, string) ( string, error)")
-	if valid == false {
-		t.Error("Expected valid params")
-	}
-
-	valid = returnsAreValid("func (string, string)  (string)")
-	if valid == true {
-		t.Error("Expected invalid params")
+	for i, f := range functions {
+		got := isValid(f.kind, f.args...)
+		if got != f.expected {
+			t.Errorf("Case %d failed, expected: %v, got: %v", i+1, f.expected, got)
+		}
 	}
 }
 
